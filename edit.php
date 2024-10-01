@@ -1,166 +1,66 @@
+<?php
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+
+    // Connect to the database
+    $conn = new mysqli('localhost', 'root', '', 'your_database');
+
+    // Fetch the student's current data
+    $sql = "SELECT * FROM students WHERE id = '$id'";
+    $result = $conn->query($sql);
+    $student = $result->fetch_assoc();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $id = $_POST['id'];
+    $nama = $_POST['nama'];
+    $kelas = $_POST['kelas'];
+
+    // Handle file upload for the photo
+    if ($_FILES['foto']['name']) {
+        $foto = $_FILES['foto']['name'];
+        $target_dir = "uploads/";
+        $target_file = $target_dir . basename($foto);
+        move_uploaded_file($_FILES['foto']['tmp_name'], $target_file);
+    } else {
+        $foto = $_POST['existing_foto'];
+    }
+
+    // Update the student's data
+    $sql = "UPDATE students SET nama = '$nama', kelas = '$kelas', foto = '$foto' WHERE id = '$id'";
+    if ($conn->query($sql) === TRUE) {
+        header("Location: index.php");
+    } else {
+        echo "Error: " . $conn->error;
+    }
+
+    $conn->close();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aina Nuzila Halwa - Computer Network Engineering</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: #f8f8f8;
-        }
-
-        .header-content h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .header-content p {
-            color: #888;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-        }
-
-        nav ul li {
-            margin-right: 15px;
-        }
-
-        nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .about-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 50px 20px;
-        }
-
-        .profile-image img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin-right: 30px;
-        }
-
-        .about-content {
-            max-width: 600px;
-        }
-
-        .about-content h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
-        .about-content p {
-            margin-bottom: 10px;
-        }
-
-        .links-section {
-            display: flex;
-            justify-content: center;
-            padding: 50px 20px;
-        }
-
-        .links {
-            display: flex;
-            gap: 20px;
-        }
-
-        .circle {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background-color: #ddd;
-            color: #333;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .resume {
-            background-color: #9ACD32;
-        }
-
-        .research {
-            background-color: #FFD700;
-        }
-
-        .outreach {
-            background-color: #87CEEB;
-        }
-
-        .personal {
-            background-color: #D3D3D3;
-        }
-
-        footer {
-            background-color: #f8f8f8;
-            padding: 20px;
-            text-align: center;
-        }
-
-        footer .contact-info p {
-            margin-bottom: 10px;
-        }
-
-        footer .contact-info a {
-            color: #333;
-            text-decoration: none;
-        }
-
-        .credits {
-            margin-top: 10px;
-            color: #888;
-        }
-    </style>
+    <title>Edit Student</title>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <h1>Aina Nuzila Halwa</h1>
-            <p>Computer Network Engineering Student</p>
-        </div>
+    <h1>Edit Student</h1>
+    <form action="edit.php?id=<?= $student['id'] ?>" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="id" value="<?= $student['id'] ?>">
 
+        <label for="nama">Name:</label>
+        <input type="text" name="nama" id="nama" value="<?= $student['nama'] ?>" required><br>
 
-    <section class="about-section">
-        <div class="profile-image">
-            <img src="profile.jpg" alt="aina nuzilaa">
-        </div>
-        <div class="about-content">
-            <h2>AINA NUZILA</h2>
-            <p>A Bit About Me</p>
-            <p>I am a student at SMK Telkom Malang and now i'm in 11th grade.</p>
-        </div>
-    </section>
+        <label for="kelas">Class:</label>
+        <input type="text" name="kelas" id="kelas" value="<?= $student['kelas'] ?>" required><br>
 
+        <label for="foto">Photo:</label>
+        <input type="file" name="foto" id="foto" accept="image/*"><br>
+        <input type="hidden" name="existing_foto" value="<?= $student['foto'] ?>">
 
-    <footer>
-        <div class="contact-info">
-
-        </div>
-        <p class="credits">© 2023 by Nicol Rider. Proudly created with Wix.com</p>
-    </footer>
+        <button type="submit">Save</button>
+    </form>
+    <a href="index.php">Exit</a>
 </body>
 </html>
