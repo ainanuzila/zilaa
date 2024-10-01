@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     move_uploaded_file($_FILES['foto']['tmp_name'], $target_file);
 
     // Connect to the database
-    $conn = new mysqli('localhost', 'root', '', 'your_database');
+    $conn = new mysqli('localhost', 'root', '0127', 'zila');
 
     // Insert the data into the students table
     $sql = "INSERT INTO students (nama, kelas, foto) VALUES ('$nama', '$kelas', '$foto')";
